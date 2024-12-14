@@ -1,11 +1,11 @@
 #include <Arduino.h>
 #include <Wire.h>
-#include "SHT31.h"
+
+#include "Adafruit_SHT31.h"
 #include "rgb_lcd.h"
 //#include <Grove_LED_Bar.h>
-
 rgb_lcd lcd;
-SHT31 sht31 = SHT31();
+Adafruit_SHT31 sht31 = Adafruit_SHT31();
 //Grove_LED_Bar bar(3, 2, 0); 
 
 const int colorR = 255;
@@ -17,7 +17,7 @@ void setup() {
   Serial.begin(115200);
   while(!Serial);
   Serial.println("begin...");  
-  sht31.begin();
+  sht31.begin(0x44);
 
   // set up the LCD's number of columns and rows:
   lcd.begin(16, 2);
@@ -26,7 +26,7 @@ void setup() {
     // Print a message to the LCD.
   lcd.print("hello, world!");
   lcd.print(millis()/1000);
-  delay(1000);
+  delay(10000);
   //set led
   pinMode(LED_BUILTIN, OUTPUT);
   //set buzzer
@@ -37,8 +37,8 @@ void setup() {
 }
 
 void loop() {
-  float temp = sht31.getTemperature();
-  float hum = sht31.getHumidity();
+  float temp = sht31.readTemperature();
+  float hum = sht31.readHumidity();
   Serial.print("Temp = "); 
   Serial.print(temp);
   Serial.println(" C"); //The unit for  Celsius because original arduino don't support speical symbols
@@ -52,26 +52,28 @@ void loop() {
   //if (value<5){
     //digitalWrite(LED_BUILTIN, HIGH); 
   //}
-
-  if (temp>20.0){
-    lcd.setRGB(255,0,0);
-     digitalWrite(6, HIGH);
-  }else if(temp<=20.0 && temp > 10.0){
-    lcd.setRGB(0,255,0);
+  if (temp>25.0){
+    lcd.setRGB(255,0,0);//red
+     digitalWrite(D6, HIGH);
+  }else if(temp<=25.0 && temp > 10.0){
+    lcd.setRGB(0,255,0);//green
   }else if(temp<=10.0){
-    lcd.setRGB(0,0,255);
+    lcd.setRGB(0,0,255);//blue
+    digitalWrite(D6, HIGH);
   }
   lcd.setCursor(0, 0);
-  lcd.print("temprature : ");
+  lcd.print("Temp:     ");
   lcd.print(temp);
   lcd.print("C");
 
   lcd.setCursor(0, 1);
-  lcd.print("Humility : ");
+  lcd.print("Humility: ");
   lcd.print(hum);
   lcd.print("%");
   lcd.print(millis()/1000);
   delay(1000); 
   //digitalWrite(LED_BUILTIN, LOW); 
   // put your main code here, to run repeatedly:
+   digitalWrite(D6, LOW);
+  
 }
